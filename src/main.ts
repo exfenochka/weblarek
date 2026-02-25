@@ -21,16 +21,16 @@ if (existingId) {
 }
 console.log('Поиск по несуществующему id:', productsModel.getItemById('несуществующий id'));
 
-productsModel.setItem(apiProducts.items[2]);
-console.log('Товар для подробного отображения:', productsModel.getItem());
+productsModel.setPreviewItem(apiProducts.items[2]);
+console.log('Товар для подробного отображения:', productsModel.getPreviewItem());
 
 // ========== ТЕСТИРОВАНИЕ КЛАССА BASKET ==========
 
 const basketModel = new Basket();
 
-basketModel.addItems(apiProducts.items[0]);
-basketModel.addItems(apiProducts.items[1]);
-basketModel.addItems(apiProducts.items[2]);
+basketModel.addItem(apiProducts.items[0]);
+basketModel.addItem(apiProducts.items[1]);
+basketModel.addItem(apiProducts.items[2]);
 console.log('После добавления 3 товаров:', basketModel.getItems());
 console.log('Количество:', basketModel.getCount());
 console.log('Общая стоимость:', basketModel.getTotalPrice());
@@ -46,7 +46,7 @@ console.log('После очистки:', basketModel.getItems());
 
 console.log('Тест товара без цены:');
 const productWithoutPrice = { ...apiProducts.items[0], price: null };
-basketModel.addItems(productWithoutPrice);
+basketModel.addItem(productWithoutPrice);
 
 // ========== ТЕСТИРОВАНИЕ КЛАССА ORDER ==========
 

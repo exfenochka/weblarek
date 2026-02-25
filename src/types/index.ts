@@ -5,6 +5,9 @@ export interface IApi {
     post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
 }
 
+// тип для ошибок формы
+export type ValidationErrors = Partial<Record<keyof IBuyer, string>>;
+
 // интерфейс товара
 export interface IProduct {
     id: string;            // уникальный идентификатор товара
@@ -27,19 +30,15 @@ export interface IBuyer {
 }
 
 // интерфейс для ответа от сервера со списком товаров
-export interface IOrderResponse {
+export interface IProductsResponse {
     items: IProduct[];
     total: number;
 }
 
 // данные заказа для отправки на сервер
-export interface IOrderRequest {
-    payment: TPayment;
-    address: string;
-    email: string;
+export interface IOrderRequest extends IBuyer {
+    items: string[];
     total: number;
-    phone: string;
-    items: string[]; // массив id товаров
 }
 
 // ответ от сервера при успешном заказе

@@ -5,8 +5,6 @@ export class Catalog {
     private items: IProduct[] = [];
     private selectedProduct: IProduct | null = null;
 
-    constructor() {}
-
     // загружает каталог
     setItems(items: IProduct[]): void {
         this.items = items;
@@ -23,12 +21,12 @@ export class Catalog {
     }
 
     // сохраняет выбранный товар для подробного отображения
-    setItem(item: IProduct): void {
+    setPreviewItem(item: IProduct): void {
         this.selectedProduct = item;
     }
 
     // возвращает выбранный товар для подробного просмотра
-    getItem(): IProduct | null {
+    getPreviewItem(): IProduct | null {
         return this.selectedProduct;
     }
 }

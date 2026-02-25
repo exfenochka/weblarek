@@ -1,4 +1,4 @@
-import { IApi, IProduct, IOrderResponse, IOrderRequest, IOrderResult } from "../../types";
+import { IApi, IProduct, IProductsResponse, IOrderRequest, IOrderResult } from "../../types";
 
 export class ApiService {
     private api: IApi;
@@ -9,7 +9,7 @@ export class ApiService {
 
     // метод получения массива товаров с сервера
     async getProducts(): Promise<IProduct[]> {
-        const response = await this.api.get<IOrderResponse>("/product/");
+        const response = await this.api.get<IProductsResponse>("/product/");
         return response.items;
     }
     

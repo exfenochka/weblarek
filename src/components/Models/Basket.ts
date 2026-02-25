@@ -4,15 +4,13 @@ import { IProduct } from '../../types';
 export class Basket {
     private items: IProduct[] = [];
 
-    constructor() {}
-
     // возвращает массив товаров в корзине
     getItems(): IProduct[] {
         return this.items;
     }
 
     // добавляет товар в корзину
-    addItems(item: IProduct): void {
+    addItem(item: IProduct): void {
         this.items.push(item);
     }
 

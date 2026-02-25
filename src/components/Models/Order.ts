@@ -1,16 +1,11 @@
-//ПОКУПАТЕЛЬ
-import { IBuyer, TPayment } from '../../types';
-
-// тип для ошибок формы
-type ValidationErrors = Partial<Record<keyof IBuyer, string>>;
+// ПОКУПАТЕЛЬ (Order.ts)
+import { IBuyer, TPayment, ValidationErrors } from '../../types';
 
 export class Order {
     private payment: TPayment = '';
     private address: string = '';
     private email: string = '';
     private phone: string = '';
-
-    constructor() {}
 
     // сохраняет данные покупателя (частично, не затирая остальные поля)
     setDataBuyer(data: Partial<IBuyer>): void {
