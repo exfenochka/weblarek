@@ -1,5 +1,5 @@
-// ПОКУПАТЕЛЬ (Order.ts)
 import { IBuyer, TPayment, ValidationErrors } from '../../types';
+import { IEvents } from "../base/Events";
 
 export class Order {
     private payment: TPayment = '';
@@ -7,7 +7,8 @@ export class Order {
     private email: string = '';
     private phone: string = '';
 
-    // сохраняет данные покупателя (частично, не затирая остальные поля)
+    constructor(protected events: IEvents) {}
+
     setDataBuyer(data: Partial<IBuyer>): void {
         if (data.payment !== undefined) {
             this.payment = data.payment;
@@ -21,6 +22,9 @@ export class Order {
         if (data.phone !== undefined) {
             this.phone = data.phone;
         }
+        
+        this.events.emit('order:updated', { buyer: this.getDataBuyer() });
+        this.validateInfoBuyer();
     }
 
     // возвращает все текущие данные покупателя
@@ -39,6 +43,13 @@ export class Order {
         this.address = '';
         this.email = '';
         this.phone = '';
+        
+        this.events.emit('order:change', {
+            payment: '',
+            address: '',
+            email: '',
+            phone: ''
+        });
     }
 
     // приватный метод для получения значения по ключу
@@ -61,24 +72,33 @@ export class Order {
 
         for (const key of toCheck) {
             const value = this.getValueByKey(key);
+            
             if (value === undefined || value === null || String(value).trim() === '') {
                 switch (key) {
                     case 'payment':
-                        errors.payment = 'Не выбран способ оплаты';
+                        errors.payment = 'Выберите способ оплаты';
                         break;
                     case 'address':
-                        errors.address = 'Не указан адрес доставки';
+                        errors.address = 'Необходимо указать адрес';
                         break;
                     case 'email':
-                        errors.email = 'Укажите email';
+                        errors.email = 'Введите email';
                         break;
                     case 'phone':
-                        errors.phone = 'Укажите телефон';
+                        errors.phone = 'Введите телефон';
                         break;
                 }
             }
+            if (key === 'email' && value && !value.includes('@')) {
+                errors.email = 'Неверный email';
+            }
+            
+            if (key === 'phone' && value && !String(value).match(/^\+?\d{10,15}$/)) {
+                errors.phone = 'Неверный телефон';
+            }
         }
 
+        this.events.emit('order:validated', { errors });
         return errors;
     }
 }

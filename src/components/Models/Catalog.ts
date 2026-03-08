@@ -1,16 +1,19 @@
-//КАТАЛОГ
 import { IProduct } from '../../types';
+import { IEvents } from "../base/Events";
 
 export class Catalog {
     private items: IProduct[] = [];
     private selectedProduct: IProduct | null = null;
 
+    constructor(private events: IEvents) {}
+
     // загружает каталог
-    setItems(items: IProduct[]): void {
+    setItems(items: IProduct[]) {
         this.items = items;
+        this.events.emit('catalog:changed');
     }
     
-    // возвращает весь массив
+    // возвращает весь массив 
     getItems(): IProduct[] {
         return this.items;
     }
@@ -23,6 +26,7 @@ export class Catalog {
     // сохраняет выбранный товар для подробного отображения
     setPreviewItem(item: IProduct): void {
         this.selectedProduct = item;
+        this.events.emit('catalog:selected', { item });
     }
 
     // возвращает выбранный товар для подробного просмотра
