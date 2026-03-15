@@ -35,11 +35,12 @@ export class Modal extends Component<IModal> {
         if (content)
         this.contentElement.replaceChildren(content);
     
-    this.container.classList.add('modal_active');
+        this.container.classList.add('modal_active');
     }
 
     close() {
         this.container.classList.remove('modal_active');
         document.body.style.overflow = "auto";
+        this.events.emit('modal:close');
     }
 }
