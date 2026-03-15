@@ -26,7 +26,6 @@ export class Catalog {
     // сохраняет выбранный товар для подробного отображения
     setPreviewItem(item: IProduct): void {
         this.selectedProduct = item;
-        this.events.emit('catalog:selected', { item });
     }
 
     // возвращает выбранный товар для подробного просмотра

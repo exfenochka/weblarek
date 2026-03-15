@@ -23,8 +23,8 @@ export class Order {
             this.phone = data.phone;
         }
         
-        this.events.emit('order:updated', { buyer: this.getDataBuyer() });
-        this.validateInfoBuyer();
+        const errors = this.validateInfoBuyer();
+        this.events.emit('order:validated', { errors });
     }
 
     // возвращает все текущие данные покупателя
@@ -44,12 +44,8 @@ export class Order {
         this.email = '';
         this.phone = '';
         
-        this.events.emit('order:change', {
-            payment: '',
-            address: '',
-            email: '',
-            phone: ''
-        });
+        const errors = this.validateInfoBuyer();
+        this.events.emit('order:validated', { errors });
     }
 
     // приватный метод для получения значения по ключу
@@ -79,7 +75,7 @@ export class Order {
                         errors.payment = 'Выберите способ оплаты';
                         break;
                     case 'address':
-                        errors.address = 'Необходимо указать адрес';
+                        errors.address = 'Необходимо ввести адрес';
                         break;
                     case 'email':
                         errors.email = 'Введите email';
@@ -89,16 +85,8 @@ export class Order {
                         break;
                 }
             }
-            if (key === 'email' && value && !value.includes('@')) {
-                errors.email = 'Неверный email';
-            }
-            
-            if (key === 'phone' && value && !String(value).match(/^\+?\d{10,15}$/)) {
-                errors.phone = 'Неверный телефон';
-            }
         }
 
-        this.events.emit('order:validated', { errors });
         return errors;
     }
 }

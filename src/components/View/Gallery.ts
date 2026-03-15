@@ -7,21 +7,15 @@ interface IGallery {
 
 export class Gallery extends Component<IGallery> {
     protected catalogElement: HTMLElement;
-    private events: IEvents;
     
-    constructor (catalogElement: HTMLElement, events: IEvents) {
+    constructor (catalogElement: HTMLElement, protected events: IEvents) {
         super(catalogElement);
+
         this.catalogElement = catalogElement;
         this.events = events;
     }
 
-    setCatalog(cards: HTMLElement[]) {
+    set catalog(cards: HTMLElement[]) {
         this.catalogElement.replaceChildren(...cards)
     }
-   render(data?: Partial<IGallery> | undefined): HTMLElement {
-    if (data?.catalog) {
-        this.setCatalog(data.catalog);
-    }
-    return this.catalogElement
-   }
 }

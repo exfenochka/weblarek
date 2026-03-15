@@ -216,296 +216,189 @@ counter:number
 catalog:HTMLElement[] - массив карточек товаров.
 
 Элементы разметки:
-'catalogElement: HTMLElement' - контейнер для галереи (.gallery)
+'catalogElement: HTMLElement'
 
 Методы класса: 
-'set catalog(items: HTMElement[])'
+'set catalog(items: HTMElement[])'- отображает переданный массив карточек товаров
 
 #### Класс Modal - модальное окно
 
 Тип данных:
-modalClose: HTMLButtonElement;
-modalContent: HTMLElement;
+closeButton: HTMLButtonElement
+contentElement: HTMLElement;
 
 Элементы разметки:
-'container: HTMLElement'
-'modalClose: HTMLButtonElement'
-'modalContent: HTMLElement'
+'closeButton: HTMLButtonElement'
+'contentElement: HTMLElement'
 
 Методы класса: 
-set content(items: HTMElement)'
+set content(items: HTMElement)'-отображает переданный элемент в модальном окне
+'open()'- открывает модальное окно
+'close()'- закрывает модальное окно
 
 #### Класс Success - cообщение об успешном оформлении заказа
 
 Тип данных:
-message: string;
+message: number;
 
 Элементы разметки:
-'container: HTMLElement'
-'titleElement: HTMLElement'
-'descriptionElement: HTMLElement'
-'closeButton: HTMLButtonElement'
+'closeButton: HTMLButtonElement;'
+'descriptionElement: HTMLElement;'
 
 Методы класса: 
-'set message(value: string)'-обновляет текст в descriptionElement.
-'render(): HTMLElement'- возвращает готовый DOM элемент для вставки в модальное окно.
+'set message(value: string)'-обновляет текст в descriptionElement
 
 #### Класс Card<T> - общий фунционал карточки товара
 
-Тип данных:
-product: IProduct;
-index?: number;
-
 Элементы разметки:
-'container: HTMLButtonElement'
-'imageElement: HTMLImageElement'
-'categoryElement: HTMLElement'
 'titleElement: HTMLElement'
 'priceElement: HTMLElement'
 
 Методы класса: 
-'setData(product: IProduct, index?: number): void' - Устанавливает общие данные: название, категорию, изображение, цену.
-'render(): HTMLElement'
+'set title(value: string)'- устанавливает название товара
+'set price(value: number | null)' - устанавливает цену товара
 
 #### Класс CardCatalog - карточка товара
 
-Тип данных:
-наследует Card<IProduct>
+Элементы разметки:
+'categoryElement: HTMLElement'
+'imageElement: HTMLImageElement'
 
 Методы класса: 
-'render(): HTMLButtonElement' - возвращает готовую карточку для вставки в галерею.
+'set category(value: string)' - устанавливает категорию товар
+'set image({ src, alt })' - устанавливает изображение товара и альтернативный текст
 
 #### Класс CardPreview - подробная карточка товара
-
-Тип данных:
-наследует Card<IProduct>
 
 Элементы разметки:
 'descriptionElement: HTMLElement'
 'buttonElement: HTMLButtonElement'
+'categoryElement: HTMLElement'
+'imageElement: HTMLImageElement'
 
 Методы класса: 
-'render(): HTMLElement' - возвращает готовую карточку для вставки в галерею.
+'set category(value: string)' - устанавливает категорию товара
+'set image({ src, alt })' - устанавливает изображение товара и альтернативный текст
+'set description(value: string)' - устанавливает текст описания товара
+'set actionLabel(value: string)' - устанавливает текст кнопки
 
 #### Класс CardBasket - подробная карточка товара
 
-Тип данных:
-наследует Card<IProduct>
-index: number;
-
 Элементы разметки:
+'indexElement: HTMLElement'
 'deleteButton: HTMLButtonElement'
 
 Методы класса: 
-'setData(product: IProduct, index: number): void' - устанавливает данные товара (название, цену, изображение, категорию)
-'render(): HTMLElement' - возвращает готовую карточку для вставки в галерею.
+'set index(value: number)' - устанавливает индекс товара в списке корзины
 
 #### Класс BasketView - модальное окно корзины
 
 Тип данных:
-items: CardBasket[]; - массив карточек товаров в корзине.
-totalPrice: number;
+items: HTMLElement[];
+total: number;
 
 Элементы разметки:
-'container: HTMLElement'
 'listElement: HTMLElement'
-'checkoutButton: HTMLButtonElement'
 'priceElement: HTMLElement'
+'buttonElement: HTMLButtonElement'
+'events: IEvents'
 
 Методы класса: 
-'render(): HTMLElement'
-'addItem(item: CardBasket): void'
-'removeItem(index: number): void'
-'updateTotalPrice(): void'
-'clear(): void'
+'set items(elements: HTMLElement[])'
+'set total(value: number)'
+'enableOrderButton()'
+'disableOrderButton()'
 
 #### Класс Form<T> - общий функционал для всех форм (валидация, блокировка кнопки отправки, обработка ошибок)
 
 Тип данных:
-fields: Record<sting, HTMLInputElement>; - обьект поля формы
-errors: HTMLElement; - контейнер для вывода сообщений об ошибках
-isValid: boolean;
+valid: boolean;
+errors: string;
 
 Элементы разметки:
-'container: HTMLFormElement' — корневой элемент <form>
-'submitButton: HTMLButtonElement' — кнопка отправки
-'errorContainer: HTMLElement' - элемент для вывода ошибок
+'submitButton: HTMLButtonElement' - кнопка отправки формы
+'errorsElement: HTMLElement' - элемент для отображения ошибок
 
 Методы класса: 
-'setFieldValue(name: string, value: string): void' - установка значения поля
-'getFieldValue(name: string): string' - возвращает текущее значение поля
-'setError(message: string): void - отображает текст ошибки в контейнер (errors: HTMLElement)
-'clearError(): void'
-'set valid(value: boolean)'
-'onSubmit(handler: (formData: Record<string, string>) => void): void' - назначает обработчик отправки формы(сбор и отправка данных в handler)
+'enableSubmit()' 
+'disableSubmit()' 
+'showErrors(message: string)'
+'clearErrors()'
 
 #### Класс FormOrder - форма заказ
 
-Тип данных:
-address: string;
-paymentMethod: 'online' | 'cash';
-
 Элементы разметки:
-'container: HTMLFormElement'
+'xpaymentButtons: HTMLButtonElement[]'
 'addressInput: HTMLInputElement'
-'onlineButton: HTMLButtonElement'
-'cashButton: HTMLButtonElement'
-'submitButton: HTMLButtonElement'
-'errorContainer: HTMLElement'
 
 Методы класса: 
-'selectPaymentMethod(method: 'online' | 'cash'): void'
-'validate(): boolean' - проверка всех заполненых полей и обновление кнопки отправки.
+'set payment(value: TPayment)' - устанавливает выбранный способ оплаты
+'set address(value: string)' - устанавливает значение поля адреса доставки
 
 #### Класс FormContacts - форма контактных данных
 
-Тип данных:
-email: string;
-phone: string;
-
 Элементы разметки:
-'container: HTMLFormElement' - корневая форма.
 'emailInput: HTMLInputElement'
 'phoneInput: HTMLInputElement'
-'submitButton: HTMLButtonElement'
-'errorContainer: HTMLElement'
 
 Методы класса: 
-'validateEmail(): boolean'
-'validatePhone(): boolean'
-'validate(): boolean' - обновление состояния valid
+'set email(value: string)' - устанавливает значение поля email
+'set phone(value: string)' - устанавливает значение поля номера телефона
 
-### Реализация классов представления событий
+### События приложения
 
-Классы CardCatalog, CardPreview, CardBasket
-card:click; - событие клика
-interface: {product: IProduct, index?: number};
-
-Класс CardPreview
-card:add-to-basket; - событие добавления
-interface: {product: IProduct};
-
-Класс CardBasket
-card:remove-from-basket; -событие удаления
-interface: {index: number};
-
-Класс Header
-gallery: basket-click; - событие клика на корзину
-Окрытие модального окна корзины.
-
-Класс Gallery
-gallery:card-click; - событие клика на карточку в галерее
-interface: {product: IProduct};
-
-Класс Modal
-modal:close;
-
-modal:open;
-interface: {content: HTMLElement};
-
-Класс BasketView
-basket:add-item; - событие добавление и обновление карточек в корзину
-interface: {item: number};
-
-basket:remove-item - событие удаления карточки из корзины
-interface: {index: number};
-
-basket:checkout; - событие открытия форм заказа
-
-Класс FormOrder
-form:submit; - событие передачи данных OrderForm.
-interface: {
-address: { adress:string, paymentMethod: 'online' | 'cash};
-form:payment-select; - событие формы на тип оплаты.
-form:validation; {isValid: boolean}; - обновление состояния валидации форм.
-}
-
-Класс FormContacts
-form:submit; - событие передачи данных формы СontactsForm.
-interface: { email: string; phone: string }
-form:validation; { isValid: boolean }
-
-### Presenter - отвечает за логику взаимодействия между Model, View и API
-
-Catalog
-catalog:changed - событие
-Получает список товаров из модели Catalog, создаёт карточки (CardCatalog), передаёт их в Gallery для отображения каталога.
-
-Gallery
-gallery:card-click - событие
-Получает выбранный товар, открывает модальное окно с CardPreview, проверяет наличие товара в корзине для отображения состояния кнопки.
-
-CardPreview
-product:toggle - событие
-Добавляет или удаляет товар из корзины (Basket) в зависимости от текущего состояния, обновляет счётчик товаров в Header.
-
-Basket
-basket:changed - событие
-Обновляет отображение корзины, пересчитывает общую стоимость и обновляет счётчик в Header.
-
-Header
-basket:open - событие
-Открывает модальное окно с содержимым корзины (BasketView).
-
-BasketView
-basket:remove - событие
-Удаляет товар из корзины (Basket), инициирует обновление корзины.
-basket:open (кнопка оформления) - событие
-Открывает форму оформления заказа (OrderForm).
-
-FormOrder
-form:submit - событие
-Сохраняет данные адреса и способ оплаты в модель Buyer, закрывает модальное окно, открывает форму контактов (ContactsForm).
-
-FormContacts
-contacts:submit - событие
-Проверяет валидность email и телефона, при успехе отправляет заказ на сервер через ApiService.postOrder, очищает корзину (Basket), отображает Success.
-
-FormOrder, FormContacts
-order:validated - событие
-Переключает доступность кнопки отправки в зависимости от валидности данных.
-
-Modal
-Управляет открытием/закрытием модальных окон с различным контентом (CardPreview, BasketView, OrderForm, ContactsForm, Success).
-
+catalog:changed — перерисовывает галерею
+catalog:selected — открывает модалку с CardPreview
+basket:changed — обновляет счётчик в Header, уведомляет cart:item-changed (обновление кнопки в превью)
+basket:cleared - basket:cleared — сбрасывает счётчик в 0 и эмитит basket:changed (для обновления)
+basket:open — клик по иконке корзины в хедере: открывает модалку с содержимым корзины (BasketView)
+basket:remove — клик по иконке удаления в карточке корзины: удаляет товар из корзины
+card:preview — клик по карточке в каталоге для просмотра в модальном окне
+card:add — клик по кнопке "Купить"/"Удалить из корзины" в модальном окне: добавляет или удаляет товар
+cart:item-changed — обновляет текст кнопки в открытом превью (меняет "Купить" на "Удалить из корзины" и наоборот)
+order:open — клик по кнопке "Оформить" в корзине: открывает форму заказа (OrderForm)
+order:next — после успешной валидации первого шага (адрес/оплата) открывает форму контактов (ContactsForm)
+contacts:submit — отправка заказа на сервер и отображение Success
+order:validated — проверяет валидность данных и обновляет состояние кнопок в формах (блокирует/разблокирует, показывает ошибки)
+form:changed — генерируется при изменениях в любой форме; обновляет модель Order
+modal:close — клик по иконке закрытия модального окна; закрывает модалку и отписывается от событий (например, обновления корзины)
+success:close — клик по кнопке в окне успеха; закрывает модальное окно
 
 #### Последовательность работы приложения:
- 
-Инициализация данных
-Презентер вызывает loadProducts(), получает список товаров с сервера через ApiService и сохраняет их в модель Catalog. После успешного получения данных вызывается событие catalog:changed.
+1. Инициализация
+Создаются экземпляры моделей, представлений, API.
+Вызывается loadProducts() – загрузка товаров с сервера.
+После успешной загрузки catalog.setItems эмитит catalog:changed.
 
-Отображение каталога
-Обработчик catalog:changed получает товары из модели Catalog, для каждого создаёт карточку (CardCatalog) и передаёт их в компонент Gallery для рендера.
+2. Отображение каталога
+Обработчик catalog:changed создаёт массив карточек CardCatalog и передаёт их в Gallery.
+Пользователь видит все доступные товары.
 
-Просмотр товара
-При клике на карточку срабатывает событие gallery:card-click. Презентер получает объект товара, проверяет наличие в корзине, создаёт экземпляр CardPreview с переданными данными и открывает модальное окно.
+3. Клик по карточке → событие card:preview.
+Презентер получает товар по id, создаёт/обновляет CardPreview, устанавливает текст кнопки в зависимости от наличия в корзине, открывает модальное окно.
 
-Добавление/удаление товара в корзину
-При клике на кнопку в CardPreview срабатывает событие product:toggle. Презентер проверяет наличие товара в модели Basket: если товар есть — удаляет, если нет — добавляет. После изменения вызывается событие basket:changed.
+4. Добавление в корзину
+Клик по кнопке «Купить» → событие card:add.
+Презентер добавляет товар в Basket (или удаляет, если уже есть).
+После изменения корзины эмитится basket:changed, обновляется счётчик в шапке, закрывается модалка.
 
-Обновление корзины
-Обработчик basket:changed создаёт карточки товаров в корзине (CardBasket) на основе актуальных данных из модели Basket, обновляет отображение BasketView и счётчик в Header.
+5. Работа с корзиной
+Клик по иконке корзины → basket:open.
+Презентер получает актуальный список товаров из Basket, создаёт карточки CardBasket, обновляет BasketView, открывает модалку.
+Кнопка удаления в карточке → basket:remove → удаление товара из модели → автоматическое обновление счётчика и (если корзина открыта) её перерисовка.
 
-Открытие корзины
-При клике на иконку корзины в Header срабатывает событие basket:open. Презентер устанавливает обработчик на кнопку оформления заказа и открывает модальное окно с содержимым корзины (BasketView).
+6. Оформление заказа
+В корзине клик «Оформить» → order:open.
+Открывается OrderForm с предзаполненными данными (если есть).
+После заполнения и нажатия «Далее» → order:next.
+Открывается ContactsForm с предзаполненными контактами.
+После валидного заполнения и нажатия «Оплатить» → contacts:submit.
 
-Удаление товара из корзины
-При клике на кнопку удаления в CardBasket срабатывает событие basket:remove. Презентер удаляет товар из модели Basket и инициирует событие basket:changed для обновления отображения.
+7. Отправка заказа
+Презентер собирает все данные из моделей (Order, Basket), формирует объект IOrderRequest, отправляет через apiService.postOrder.
+При успехе: очищает корзину (basket.clearItems → basket:cleared), очищает данные заказа, открывает Success.
+При ошибке – логирует в консоль (можно расширить до уведомления пользователя).
 
-Оформление заказа (шаг 1 — адрес и оплата)
-При клике на кнопку оформления в BasketView срабатывает событие order:open. Презентер создаёт форму OrderForm, устанавливает обработчик сабмита и открывает модальное окно с формой.
-
-Оформление заказа (шаг 2 — контакты)
-После сабмита OrderForm срабатывает событие order:completed, затем contacts:open. Презентер создаёт форму ContactsForm, устанавливает обработчики валидации и сабмита, открывает модальное окно с формой.
-
-Валидация контактов
-При изменении полей в ContactsForm срабатывает событие buyer:fieldChanged, обновляющее данные в модели Buyer. При сабмите формы проверяется валидность email и телефона. В случае ошибок генерируется событие order:validated, которое передаёт ошибки в форму для отображения.
-
-Завершение заказа
-При успешной валидации контактов срабатывает событие contacts:submit. Презентер собирает все данные заказа (товары из корзины, адрес, способ оплаты, контакты) и отправляет на сервер через ApiService. После успешной отправки корзина очищается, создаётся компонент Success с сообщением о списании синапсов, открывается модальное окно с успешным оформлением.
-
-Закрытие успешного оформления
-При клике на кнопку закрытия в Success срабатывает колбэк, который закрывает модальное окно и плавно прокручивает страницу вверх.
-
-Обработка ошибок загрузки
-При ошибке загрузки товаров с сервера в loadProducts() ошибка логируется в консоль для отладки.
+8. Завершение
+Клик по кнопке в Success → success:close → закрытие модалки.
+Счётчик корзины обнулён, каталог снова доступен.

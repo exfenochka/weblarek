@@ -1,57 +1,74 @@
 import { Card } from "./Card";
-import { IProduct } from "../../../types";
 import { ensureElement } from "../../../utils/utils";
 import { IEvents } from "../../base/Events";
 
-export class CardPreview extends Card<IProduct> {
-  private descriptionElement: HTMLElement;
-  private buttonElement: HTMLButtonElement;
+export class CardPreview extends Card {
+  protected descriptionElement: HTMLElement;
+  protected buttonElement: HTMLButtonElement;
+  protected categoryElement: HTMLElement;
+  protected imageElement: HTMLImageElement;
 
-  constructor(container: HTMLElement, events: IEvents) {
+  constructor(container: HTMLElement, protected events: IEvents) {
     super(container, events);
 
     this.descriptionElement = ensureElement<HTMLElement>(
-      ".card__text",
-      container
+       '.card__text',
+       this.container
     );
+
+    this.categoryElement = ensureElement<HTMLElement>(
+		'.card__category',
+		this.container
+	);
+
+	this.imageElement = ensureElement<HTMLImageElement>(
+		'.card__image',
+		this.container
+	);
+
     this.buttonElement = ensureElement<HTMLButtonElement>(
-      ".card__button",
-      container
-    );
+		'.card__button',
+		this.container
+	);
+
+    this.buttonElement.addEventListener('click', () => {
+		this.events.emit('card:add', { id: this.container.dataset.id });
+	});
+
+    this.events.on(
+	'cart:item-changed',
+	({ id, inCart }: { id: string; inCart: boolean }) => {
+		if (this.container.dataset.id !== id) return;
+		this.actionLabel = inCart ? 'Удалить из корзины' : 'Купить';
+	});
   }
 
-  // установка данных
-  setData(product: IProduct & { inCart?: boolean }, index?: number) {
-    super.setData(product, index);
-    this.descriptionElement.textContent = product.description;
+  set category(value: string) {
+	this.categoryElement.textContent = value;
+	}
 
-    this.updateButton(product);
+  set image({ src, alt }: { src: string; alt?: string }) {
+	this.imageElement.src = src;
+	if (alt) this.imageElement.alt = alt;
+	}
 
-    this.events.on("basket:changed", ({ items }: { items: IProduct[] }) => { //
-      product.inCart = items.some((i) => i.id === product.id);
-      this.updateButton(product);
-    });
+  set description(value: string) {
+	this.descriptionElement.textContent = value;
+	}
 
-    this.buttonElement.onclick = () => {
-      if (!product.price) return;
+  set price(value: number | null) {
+		super.price = value;
 
-      this.events.emit("product:toggle", { id: product.id });
-      this.events.emit("modal:close");
-    };
-  }
+		if (value === null) {
+			this.buttonElement.disabled = true;
+			this.buttonElement.textContent = 'Недоступно';
+		} else {
+			this.buttonElement.disabled = false;
+			this.buttonElement.textContent = 'Купить';
+		}
+	}
 
-  private updateButton(product: IProduct & { inCart?: boolean }) {
-    if (!product.price) {
-      this.buttonElement.textContent = "Недоступно";
-      this.buttonElement.disabled = true;
-    } else if (product.inCart) {
-      this.buttonElement.textContent = product.inCart
-        ? "Удалить из корзины"
-        : "Купить";
-      this.buttonElement.disabled = false;
-    } else {
-      this.buttonElement.textContent = "Купить";
-      this.buttonElement.disabled = false;
-    }
-  }
+  set actionLabel(value: string) {
+		this.buttonElement.textContent = value;
+	}
 }

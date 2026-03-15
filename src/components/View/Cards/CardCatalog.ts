@@ -1,25 +1,48 @@
 import { Card } from "./Card";
-import { IProduct } from "../../../types";
 import { IEvents } from "../../base/Events";
+import { ensureElement } from '../../../utils/utils';
+import { categoryMap } from '../../../utils/constants';
 
-export class CardCatalog extends Card<IProduct> {
-  private productData!: IProduct;
+export class CardCatalog extends Card {
+  protected categoryElement: HTMLElement;
+  protected imageElement: HTMLImageElement;
 
-  constructor(container: HTMLElement, events: IEvents) {
+  constructor(container: HTMLElement, protected events: IEvents) {
     super(container, events);
 
-    this.container.addEventListener("click", () => {
-      if (!this.productData) return;
+    this.categoryElement = ensureElement<HTMLElement>(
+		'.card__category',
+		this.container
+	);
 
-      this.events.emit("gallery:card-click", {
-        product: this.productData,
-        imageSrc: this.imageElement.src,
-      });
-    });
+    this.imageElement = ensureElement<HTMLImageElement>(
+		'.card__image',
+		this.container
+	);
+
+    this.container.addEventListener('click', () => {
+		this.events.emit('card:preview', { id: this.container.dataset.id });
+	});
   }
 
-  setData(product: IProduct, index?: number) {
-    super.setData(product, index);
-    this.productData = product;
+  set image({ src, alt }: { src: string; alt?: string }) {
+    this.imageElement.src = src;
+    if (alt) this.imageElement.alt = alt;
   }
+
+  set category(value: string) {
+		this.categoryElement.textContent = value;
+
+		Object.values(categoryMap).forEach(mod =>
+			this.categoryElement.classList.remove(mod)
+		);
+
+		this.categoryElement.classList.add('card__category');
+
+		const modifier = categoryMap[value as keyof typeof categoryMap];
+
+		if (modifier) {
+			this.categoryElement.classList.add(modifier);
+		}
+	}
 }

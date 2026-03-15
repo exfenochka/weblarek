@@ -1,49 +1,56 @@
 import { IEvents } from "../base/Events";
 import { ensureElement } from "../../utils/utils";
+import { Component } from "../base/Component";
 
-export class BasketView {
+interface IBasket {
+	items: HTMLElement[];
+	total: number;
+}
+
+export class BasketView extends Component<IBasket>{
   private listElement: HTMLElement;
   private priceElement: HTMLElement;
   private buttonElement: HTMLButtonElement;
   private events: IEvents;
 
   constructor(container: HTMLElement, events: IEvents) {
+    super(container);
+
     this.events = events;
 
-    this.listElement = ensureElement<HTMLElement>(".basket__list", container);
-    this.priceElement = ensureElement<HTMLElement>(".basket__price", container);
-    this.buttonElement = ensureElement<HTMLButtonElement>(
-      ".basket__button",
-      container
+    this.listElement = ensureElement<HTMLElement>(
+      '.basket__list', 
+      this.container
     );
 
-    this.showEmptyState();
+    this.priceElement = ensureElement<HTMLElement>(
+      '.basket__price', 
+      this.container
+    );
+
+    this.buttonElement = ensureElement<HTMLButtonElement>(
+      '.basket__button',
+      this.container
+    );
+
+    this.buttonElement.addEventListener('click', () => {
+      this.events.emit('order:open'); 
+    })
   }
 
-  // метод для отображения пустой корзины
-  private showEmptyState() {
-    this.listElement.innerHTML = `<p class="basket__empty">Корзина пуста</p>`;
-    this.priceElement.textContent = "0 синапсов";
-    this.buttonElement.disabled = true;
-  }
+  set items(elements: HTMLElement[]) {
+		this.listElement.replaceChildren(...elements);
+	}
 
-  update(itemsHtml: HTMLElement[], total: number) {
-    this.listElement.innerHTML = "";
+	set total(value: number) {
+		this.priceElement.textContent = `${value} синапсов`;
+	}
 
-    if (!itemsHtml || itemsHtml.length === 0) {
-      this.showEmptyState();
-      return;
-    }
+  enableOrderButton() {
+		this.buttonElement.disabled = false;
+	}
 
-    this.buttonElement.disabled = false;
-    itemsHtml.forEach((el) => this.listElement.append(el));
-
-    const totalRounded = Math.round(total);
-    this.priceElement.textContent =
-      totalRounded < 10000
-        ? `${totalRounded} синапсов`
-        : `${totalRounded.toLocaleString("ru-RU", {
-            maximumFractionDigits: 0,
-          })} синапсов`;
-  }
+	disableOrderButton() {
+		this.buttonElement.disabled = true;
+	}
 }

@@ -1,70 +1,49 @@
-import { Form, IFormData } from "./Form";
+import { Form } from "./Form";
 import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/Events";
 
-export interface IContactsFormData extends IFormData {
-  email: string;
-  phone: string;
-}
-
-export class ContactsForm extends Form<IContactsFormData> {
+export class ContactsForm extends Form{
   protected emailInput: HTMLInputElement;
   protected phoneInput: HTMLInputElement;
-  protected submitButton: HTMLButtonElement;
 
-  constructor(container: HTMLFormElement, private events: IEvents) {
-    super(container);
+  constructor(protected events: IEvents, container: HTMLElement,) {
+    super(events, container);
 
     this.emailInput = ensureElement<HTMLInputElement>(
       'input[name="email"]',
-      container
-    )!;
+      this.container
+    );
+
     this.phoneInput = ensureElement<HTMLInputElement>(
       'input[name="phone"]',
-      container
-    )!;
-    this.submitButton = ensureElement<HTMLButtonElement>(
-      'button[type="submit"]',
-      container
-    )!;
+      this.container
+    );
 
-    const emitFieldChanged = () => {
-      this.events.emit("buyer:fieldChanged", {
-        formData: {
-          email: this.emailInput.value,
-          phone: this.phoneInput.value,
-        },
-      });
-    };
+		this.emailInput.addEventListener('input', () => {
+			this.events.emit('form:changed', {
+				field: 'email',
+				value: this.emailInput.value,
+			});
+		});
 
-    this.emailInput.addEventListener("input", emitFieldChanged);
-    this.phoneInput.addEventListener("input", emitFieldChanged);
+		this.phoneInput.addEventListener('input', () => {
+			this.events.emit('form:changed', {
+				field: 'phone',
+				value: this.phoneInput.value,
+			});
+		});
 
-    this.submitButton.disabled = true;
+		this.container.addEventListener('submit', event => {
+			event.preventDefault();
+			this.events.emit('contacts:submit');
+		});
   }
 
-    // обновляет состояние формы и отображает ошибки
-    public setValidationErrors(errors: Record<string, string>) {
-        if (errors.email)  {this.setError(errors.email);
-        } else if (errors.phone) {this.setError(errors.phone);
-        } else { this.clearError();
-    }
+  set email(value: string) {
+		this.emailInput.value = value;
+	}
 
-        const hasErrors = Boolean(errors.email || errors.phone);
-        this.valid = !hasErrors;
-        this.submitButton.disabled = hasErrors;
-      }
-
- public onSubmit() {
-    this.container.addEventListener("submit", (event) => {
-      event.preventDefault();
-
-      const formData: IContactsFormData = {
-        email: this.emailInput.value,
-        phone: this.phoneInput.value,
-      };
-
-      this.events.emit("contacts:submit", { formData });
-    });
-  }
+	set phone(value: string) {
+		this.phoneInput.value = value;
+	}
 }

@@ -1,6 +1,6 @@
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
-import { EventEmitter, IEvents } from "../base/Events";
+import { IEvents } from "../base/Events";
 
 interface IHeader {
   counter: number;
@@ -9,25 +9,23 @@ interface IHeader {
 export class Header extends Component<IHeader> {
   protected counterElement: HTMLElement;
   protected basketButton: HTMLButtonElement;
-  protected events: EventEmitter;
 
-  constructor(container: HTMLElement, events: EventEmitter) {
+  constructor(container: HTMLElement, protected events: IEvents) {
     super(container);
 
-    this.events = events;
-
     this.counterElement = ensureElement<HTMLElement>(
-      ".header__basket-counter",
-      container
+      '.header__basket-counter',
+      this.container
     );
+
     this.basketButton = ensureElement<HTMLButtonElement>(
-      ".header__basket",
-      container
+      '.header__basket',
+      this.container
     );
 
     // подписка на клик по кнопке корзины
     this.basketButton.addEventListener("click", () => {
-      this.events.emit("basket:open");
+      this.events.emit('basket:open');
     });
   }
 
