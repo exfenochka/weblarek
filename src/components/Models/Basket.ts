@@ -18,7 +18,7 @@ export class Basket {
     }
 
     // удаляет товар из корзины по объекту
-    deleteItemById(id: string): void {  //removeItem
+    deleteItemById(id: string): void {
         this.items = this.items.filter(product => product.id !== id);
         this.events.emit('basket:changed', { items: this.items});
     }

@@ -16,8 +16,8 @@ import { CardCatalog } from './components/View/Cards/CardCatalog';
 import { CardPreview } from './components/View/Cards/CardPreview';
 import { CardBasket } from './components/View/Cards/CardBasket';
 
-import { ContactsForm} from "./components/Forms/FormContacts";
-import { OrderForm } from './components/Forms/FormOrder';
+import { ContactsForm} from "./components/View/Forms/FormContacts";
+import { OrderForm } from './components/View/Forms/FormOrder';
 
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
@@ -53,9 +53,6 @@ const formOrder = new OrderForm(events, formOrderElement);
 const formContactsElement = cloneTemplate<HTMLElement>('#contacts');
 const formContacts = new ContactsForm(events, formContactsElement);
 
-const previewContainer = cloneTemplate(cardPreviewTemplate);
-const cardPreview = new CardPreview(previewContainer, events);
-
 const basketContainer = cloneTemplate(basketTemplate);
 const basketView = new BasketView(basketContainer, events);
 
@@ -75,19 +72,16 @@ async function loadProducts() {
 // рендер
 events.on('catalog:changed', () => {
   const products = catalog.getItems();
-
   const cards = products.map(product => {
-    const card = new CardCatalog(cloneTemplate(cardCatalogTemplate), events);
+    const card = new CardCatalog(cloneTemplate(cardCatalogTemplate), {
+      onClick: () => events.emit('card:preview', { id: product.id })
+    });
     card.title = product.title;
     card.price = product.price;
     card.category = product.category;
     card.image = { src: CDN_URL + product.image, alt: product.title };
-
-    const cardElement = card.render();
-    cardElement.dataset.id = product.id;
-    return cardElement;
+    return card.render();
   });
-
   gallery.catalog = cards;
 });
 
@@ -96,68 +90,56 @@ events.on('card:preview', ({ id }: { id: string }) => {
   const product = catalog.getItemById(id);
   if (!product) return;
 
+  const previewContainer = cloneTemplate(cardPreviewTemplate);
+  const cardPreview = new CardPreview(previewContainer, {
+    onAction: () => events.emit('card:add', { id: product.id })
+  });
   cardPreview.title = product.title;
   cardPreview.price = product.price;
   cardPreview.category = product.category;
   cardPreview.description = product.description;
   cardPreview.image = { src: CDN_URL + product.image, alt: product.title };
-
-  const inBasket = basket.hasItem(product.id);
-  cardPreview.actionLabel = inBasket ? 'Удалить из корзины' : 'Купить';
-
-  previewContainer.dataset.id = product.id;
+  cardPreview.actionLabel = basket.hasItem(product.id) ? 'Удалить из корзины' : 'Купить';
 
   modal.content = previewContainer;
   modal.open();
 });
 
-// удаление и добавление
-events.on('card:add', ({ id }: { id: string }) => {
-  console.log('card:add получен, id =', id);
-  const product = catalog.getItemById(id);
-  if (!product) return;
-
-  if (basket.hasItem(product.id)) {
-    basket.deleteItemById(product.id);
-  } else {
-    basket.addItem(product);
-  }
-
-  header.counter = basket.getCount();
-  modal.close();
-});
+events.on('card:add', ({ id }: { id: string }) => { 
+  const product = catalog.getItemById(id); 
+  if (!product) return; 
+ 
+  if (basket.hasItem(product.id)) { 
+    basket.deleteItemById(product.id); 
+  } else { 
+    basket.addItem(product); 
+  } 
+ 
+  modal.close(); 
+}); 
 
 // изменения в корзине
 events.on('basket:changed', () => {
-  header.counter = basket.getCount();
-
-  const currentProduct = catalog.getPreviewItem();
-  if (currentProduct) {
-    events.emit('cart:item-changed', {
-      id: currentProduct.id,
-      inCart: basket.hasItem(currentProduct.id),
-    });
-  }
+  header.counter = basket.getCount();  //не поняла задачу и как пределать оставила как есть 
 });
 
 events.on('basket:cleared', () => {
-  header.counter = 0;
-  events.emit('basket:changed');
+  header.counter = 0; 
+  events.emit('basket:changed'); // просто работает просто оставила 
+  modal.close(); 
 });
 
 // открытие корзины
 events.on('basket:open', () => {
   const items = basket.getItems();
-
   const basketCards = items.map((product, index) => {
     const cardElement = cloneTemplate(cardBasketTemplate);
-    cardElement.dataset.id = product.id;
-
-    const cardBasket = new CardBasket(cardElement, events);
+    const cardBasket = new CardBasket(cardElement, {
+      onRemove: () => basket.deleteItemById(product.id)
+    });
     cardBasket.index = index + 1;
     cardBasket.title = product.title;
     cardBasket.price = product.price;
-
     return cardBasket.render();
   });
 
@@ -169,14 +151,9 @@ events.on('basket:open', () => {
   } else {
     basketView.enableOrderButton();
   }
-
+  
   modal.content = basketContainer;
   modal.open();
-});
-
-//  удаление 
-events.on('basket:remove', ({ id }: { id: string }) => {
-  basket.deleteItemById(id);
 });
 
 // открытие формы (первый шаг)
@@ -185,8 +162,7 @@ events.on('order:open', () => {
   formOrder.payment = buyer.payment;
   formOrder.address = buyer.address;
 
-  const errors = order.validateInfoBuyer(['payment', 'address']);
-  events.emit('order:validated', { errors });
+  order.setDataBuyer({ payment: buyer.payment, address: buyer.address });
 
   modal.content = formOrder.render();
   modal.open();
@@ -198,8 +174,7 @@ events.on('order:next', () => {
   formContacts.email = buyer.email;
   formContacts.phone = buyer.phone;
 
-  const errors = order.validateInfoBuyer(['email', 'phone']);
-  events.emit('order:validated', { errors });
+  order.setDataBuyer({ email: buyer.email, phone: buyer.phone });
 
   modal.content = formContacts.render();
   modal.open();
@@ -261,15 +236,13 @@ events.on('contacts:submit', async () => {
 
   try {
     const result = await apiService.postOrder(orderData);
-
-    // const successElement = cloneTemplate(successTemplate);
-    // const success = new Success(successElement, events);
     successView.message = result.total;
 
     modal.content = successContainer;
     modal.open();
 
     basket.clearItems();
+    events.emit('basket:changed');
     order.clearInfoBuyer();
   } catch (error) {
     console.error('Ошибка оформления заказа:', error);

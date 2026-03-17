@@ -1,6 +1,9 @@
 import { Card } from "./Card";
 import { ensureElement } from "../../../utils/utils";
-import { IEvents } from "../../base/Events";
+
+interface ICardPreviewActions {
+	onAction: () => void;
+}
 
 export class CardPreview extends Card {
   protected descriptionElement: HTMLElement;
@@ -8,8 +11,8 @@ export class CardPreview extends Card {
   protected categoryElement: HTMLElement;
   protected imageElement: HTMLImageElement;
 
-  constructor(container: HTMLElement, protected events: IEvents) {
-    super(container, events);
+  constructor(container: HTMLElement, actions: ICardPreviewActions) {
+    super(container);
 
     this.descriptionElement = ensureElement<HTMLElement>(
        '.card__text',
@@ -31,32 +34,25 @@ export class CardPreview extends Card {
 		this.container
 	);
 
-    this.buttonElement.addEventListener('click', () => {
-		this.events.emit('card:add', { id: this.container.dataset.id });
-	});
-
-    this.events.on(
-	'cart:item-changed',
-	({ id, inCart }: { id: string; inCart: boolean }) => {
-		if (this.container.dataset.id !== id) return;
-		this.actionLabel = inCart ? 'Удалить из корзины' : 'Купить';
-	});
-  }
-
-  set category(value: string) {
-	this.categoryElement.textContent = value;
+	if(actions?.onAction) {
+		this.buttonElement.addEventListener('click', actions.onAction);
+		}
 	}
 
-  set image({ src, alt }: { src: string; alt?: string }) {
-	this.imageElement.src = src;
-	if (alt) this.imageElement.alt = alt;
+  	set category(value: string) {
+		this.categoryElement.textContent = value;
 	}
 
-  set description(value: string) {
-	this.descriptionElement.textContent = value;
+  	set image({ src, alt }: { src: string; alt?: string }) {
+		this.imageElement.src = src;
+		if (alt) this.imageElement.alt = alt;
 	}
 
-  set price(value: number | null) {
+  	set description(value: string) {
+		this.descriptionElement.textContent = value;
+	}
+
+  	set price(value: number | null) {
 		super.price = value;
 
 		if (value === null) {
@@ -68,7 +64,7 @@ export class CardPreview extends Card {
 		}
 	}
 
-  set actionLabel(value: string) {
+  	set actionLabel(value: string) {
 		this.buttonElement.textContent = value;
 	}
 }
